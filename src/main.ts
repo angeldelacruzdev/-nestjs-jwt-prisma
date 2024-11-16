@@ -4,6 +4,8 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
+declare const module: any;
+
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -25,5 +27,10 @@ async function bootstrap() {
   app.enableCors();
 
   await app.listen(process.env.PORT ?? 3000);
+
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap();
