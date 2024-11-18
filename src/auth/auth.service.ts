@@ -1,22 +1,22 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto';
 import { Tokens } from './types';
 
-@Injectable()
-export class AuthService {
+import { AuthJwt } from './abstract/auth-jwt';
 
-    constructor(private readonly prismaService: PrismaService) { }
+@Injectable()
+export class AuthService extends AuthJwt {
+
+    constructor(public prismaService: PrismaService, public jwtService: JwtService) {
+        super(jwtService, prismaService);
+    }
 
     async signup(dto: AuthDto): Promise<Tokens> {
         try {
-
-            if (this.validateEmailExiste(dto.email)) throw new ConflictException("A user with this email already exists.")
-
-            const saltOrRounds = 10;
-            const hash = await bcrypt.hash(dto.password, saltOrRounds);
-
+            if (await this.validateEmailExiste(dto.email)) throw new ConflictException("A user with this email already exists.")
+            const hash = await this.hash(dto.password);
             const created = await this.prismaService.user.create({
                 data: {
                     name: dto.name,
@@ -25,7 +25,10 @@ export class AuthService {
                 }
             })
 
-            return  
+            const tokens = await this.getToken(created.id, created.email);
+            await this.updatedRtHash(created.id, tokens.refresh_token);
+
+            return tokens
         } catch (error) {
             if (error instanceof ConflictException) {
                 throw error;
@@ -34,9 +37,11 @@ export class AuthService {
         }
 
     }
-    async signin() { }
-    async logout() { }
-    async refreshToken() { }
+
+    async signin() {
+
+
+    }
 
     private async validateEmailExiste(email: string): Promise<boolean> {
         try {
@@ -50,6 +55,5 @@ export class AuthService {
             throw new HttpException("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 }
