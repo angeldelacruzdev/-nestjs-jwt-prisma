@@ -1,10 +1,10 @@
 import { AuthService } from './auth.service';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { AuthDto } from './dto';
+import { AuthDto, SigninDto } from './dto';
 import { Tokens } from './types';
 import { AtGuard } from './guards';
 import { RtGuard } from './guards/rt-guards';
-import { GetCurrentUser, GetCurrentUserId, Public } from './decorators';
+import { GetCurrentUser, GetCurrentUserId, GetRefreshToken, Public } from './decorators';
 
 @Controller({
     path: 'auth',
@@ -22,14 +22,15 @@ export class AuthController {
 
     @Public()
     @Post('signin')
-    async signin() {
-        await this.authService.signin()
+    async signin(@Body() dto: SigninDto) {
+        return await this.authService.signin(dto)
     }
 
     @UseGuards(AtGuard)
     @Post('logout')
     async logout(@GetCurrentUserId() userId: number) {
-        await this.authService.logout(userId)
+        const result = await this.authService.logout(userId);
+        return result
     }
 
 
@@ -38,10 +39,9 @@ export class AuthController {
     @Post('refresh')
     async refreshToken(
         @GetCurrentUserId() userId: number,
-        @GetCurrentUser('refreshToken') refreshToken: string
+        @GetRefreshToken() refreshToken: string
     ) {
-        console.log(refreshToken)
-        await this.authService.refreshToken(userId, refreshToken)
+        return await this.authService.refreshToken(userId, refreshToken)
     }
 
 }

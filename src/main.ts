@@ -1,8 +1,9 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+
 
 declare const module: any;
 
@@ -17,10 +18,6 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-
-
-
-
   app.setGlobalPrefix('api');
 
   app.use(helmet())

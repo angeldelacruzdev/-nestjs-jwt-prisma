@@ -1,23 +1,21 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
-
+@Injectable()
 export class RtGuard extends AuthGuard('jwt-refresh') {
     constructor(private readonly jwService: JwtService) {
         super()
     }
 
-
-    anActivate(
+    async canActivate(
         context: ExecutionContext,
-    ): boolean | Promise<boolean> | Observable<boolean> {
+    ) {
         const request = context.switchToHttp().getRequest();
-        const token = request.headers?.refreshtoken?.split(' ')[1]
-        console.log(token)
-        const payload = this.validateToken(token);
-        console.log(payload)
-        return false
+        const token = request.headers?.refreshtoken?.split(' ')[1];
+        const payload = await this.validateToken(token);
+        request.user = payload;
+        request.refreshToken = token;
+        return true
     }
 
     private async validateToken(token: string) {
@@ -25,13 +23,13 @@ export class RtGuard extends AuthGuard('jwt-refresh') {
         try {
             return await this.jwService.verifyAsync(token, { secret });
         } catch (error) {
-            if (error.name === 'TokenExpiredError') {
-                throw new UnauthorizedException('El token ha expirado.');
-            } else if (error.name === 'JsonWebTokenError') {
-                throw new UnauthorizedException('Token inválido o firma incorrecta.');
-            } else {
-                throw new UnauthorizedException('Error al procesar el token.');
-            }
+            const errorMessages: Record<string, string> = {
+                TokenExpiredError: 'El token ha expirado.',
+                JsonWebTokenError: 'Token inválido o firma incorrecta.',
+            };
+
+            const message = errorMessages[error.name] || 'Error al procesar el token.';
+            throw new UnauthorizedException(message);
         }
     }
 }

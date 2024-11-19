@@ -13,11 +13,8 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
         })
     }
     async validate(req: FastifyRequest, payload: any) {
-        console.log(req, 'Hola')
-        // const refreshToken = req.get('authorization').replace('Bearer', '').trim();
         return {
             ...payload,
-            // refreshToken,
         };
     }
 }

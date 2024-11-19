@@ -1,10 +1,11 @@
 
-import { ConflictException, ForbiddenException, InternalServerErrorException } from "@nestjs/common";
+import { ConflictException, ForbiddenException, HttpException, HttpStatus, InternalServerErrorException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
 import { Tokens } from "../types";
 import { PrismaService } from '../../prisma/prisma.service';
 import { HashingException, UpdateHashException } from './../../exceptions';
+import { User } from "@prisma/client";
 
 
 export abstract class AuthJwt {
@@ -110,14 +111,16 @@ export abstract class AuthJwt {
      * user's ID or subject identifier. It is used to identify the user whose refresh token hash needs to
      * be updated to `null` during the logout process.
      */
-    async logout(sub: number) {
+    async logout(sub: number): Promise<boolean> {
         try {
-            await this.prismaService.user.update({
+            const result = await this.prismaService.user.update({
                 where: { id: sub },
                 data: {
                     refreshTokenHash: null,
                 },
             });
+
+            return !!result;
         } catch (error) {
             throw new UpdateHashException(sub, error.message);
         }
@@ -172,4 +175,54 @@ export abstract class AuthJwt {
             throw new InternalServerErrorException('Error al procesar el token de actualización.');
         }
     }
+
+    /**
+     * This TypeScript function asynchronously finds a user by their email using Prisma.
+     * @param {string} email - The `findUserEmail` function is an asynchronous function that takes an
+     * email address as a parameter and returns a Promise that resolves to a `User` object. The function
+     * uses the `prismaService` to query the database and find the first user with the specified email
+     * address.
+     * @returns The `findUserEmail` function is returning a Promise that resolves to a `User` object.
+     */
+    async findUserEmail(email: string): Promise<User> {
+        const user = await this.prismaService.user.findFirst({
+            where: {
+                email
+            }
+        })
+        return user;
+    }
+
+
+    /**
+     * The function `compareUserPassword` asynchronously compares an authentication password with a hashed
+     * password using bcrypt and returns a boolean indicating whether they match.
+     * @param {string} authPassword - The `authPassword` parameter is the password provided by the user
+     * during authentication, typically entered through a login form or API request. This password needs to
+     * be compared with the hashed password stored in the database (retrieved as `prismaPassword`) to
+     * verify the user's identity. The `compare
+     * @param {string} prismaPassword - The `prismaPassword` parameter in the `compareUserPassword`
+     * function refers to the hashed password stored in your database, typically hashed using a secure
+     * hashing algorithm like bcrypt. When a user tries to authenticate, their input password
+     * (`authPassword`) is compared with the hashed password retrieved from the database to
+     * @returns A boolean value is being returned. If the authentication password matches the Prisma
+     * password, the function returns `true`.
+     */
+    async compareUserPassword(authPassword: string, prismaPassword: string): Promise<boolean> {
+        try {
+
+            const rtMatches = await bcrypt.compare(authPassword, prismaPassword);
+            if (!rtMatches) {
+                throw new ForbiddenException('Authentication failed. Please check your credentials.');
+            }
+
+            return rtMatches;
+        } catch (error) {
+            if (error instanceof ForbiddenException) {
+                throw error
+            }
+            throw new HttpException("An unexpected error occurred. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
