@@ -13,19 +13,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  USER
+model User {
+  id               Int      @id @default(autoincrement())
+  name             String   @db.VarChar(100)
+  email            String   @unique @db.VarChar(255)
+  password         String   @db.VarChar(255)
+  isActive         Boolean  @default(true)
+  refreshTokenHash String?  @db.VarChar(255)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  role             Role     @relation(fields: [role_id], references: [id])
+  role_id          Int      @db.Integer()
+  Profile          Profile?
 }
 
-model User {
-  id               Int     @id @default(autoincrement())
-  name             String  @db.VarChar(100)
-  email            String  @unique @db.VarChar(255)
-  password         String  @db.VarChar(255)
-  role             Role    @default(USER)
-  isActive         Boolean @default(true)
-  refreshTokenHash String? @db.VarChar(255) // Opcional, se almacena el hash del token de actualización
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Role {
+  id         Int          @unique @default(autoincrement())
+  name       String       @db.VarChar()
+  created_at DateTime     @default(now())
+  updated_at DateTime?    @updatedAt()
+  deleted_at DateTime?    @db.Timestamp()
+  Permission Permission[]
+  User       User[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id         Int     @unique @default(autoincrement())
+  role       Role    @relation(fields: [role_id], references: [id])
+  role_id    Int     @db.Integer()
+  action     String  @db.VarChar()
+  subject    String  @db.VarChar()
+  inverted   Boolean @default(false)
+  conditions Json?   @db.JsonB()
+  reason     String? @db.Text()
+
+  created_at DateTime  @default(now())
+  updated_at DateTime? @updatedAt()
+  deleted_at DateTime? @db.Timestamp()
+
+  @@map("permissions")
+}
+
+model Profile {
+  id          Int      @id @default(autoincrement())
+  bio         String?  @db.Text // Biografía opcional
+  avatarUrl   String?  @db.VarChar(255) // URL de la imagen de perfil
+  phoneNumber String?  @db.VarChar(20) // Número de teléfono opcional
+  userId      Int      @unique // Relación con el usuario
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("profiles")
 }
