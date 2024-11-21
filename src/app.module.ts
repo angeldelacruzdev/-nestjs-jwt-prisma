@@ -8,6 +8,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { AtGuard } from './auth/guards';
 import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -15,7 +17,7 @@ import { UsersModule } from './users/users.module';
   }), ThrottlerModule.forRoot([{
     ttl: 60000,
     limit: 10,
-  }]), PrismaModule, AuthModule, UsersModule],
+  }]), PrismaModule, AuthModule, UsersModule, RolesModule, PermissionsModule],
   providers: [
     {
       provide: APP_GUARD,

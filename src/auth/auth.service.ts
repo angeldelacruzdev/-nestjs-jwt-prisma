@@ -32,6 +32,7 @@ export class AuthService extends AuthJwt {
 
             return tokens
         } catch (error) {
+            console.log(error)
             const allowedExceptions = [UnauthorizedException, UpdateHashException, ConflictException, HashingException];
 
             if (allowedExceptions.some((exception) => error instanceof exception)) {

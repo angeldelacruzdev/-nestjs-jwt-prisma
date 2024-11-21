@@ -22,9 +22,11 @@ model User {
   refreshTokenHash String?  @db.VarChar(255)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  role             Role     @relation(fields: [role_id], references: [id])
+  role             Role?     @relation(fields: [role_id], references: [id])
   role_id          Int      @db.Integer()
   Profile          Profile?
+
+   @@map("users6")
 }
 
 model Role {
