@@ -1,12 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, Query, Put, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 import { Prisma } from '@prisma/client';
+import { checkAbilites } from '../casls/decorators/abilities.decorator';
+import { AbilitiesGuard } from '../casls/guards/abilities.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) { }
 
+
+  @checkAbilites({ action: 'create', subject: 'User' })
+  @UseGuards(AbilitiesGuard)
   @Post()
   async createUser(@Body() data: Prisma.UserCreateInput) {
     try {
@@ -16,6 +21,9 @@ export class UsersController {
     }
   }
 
+
+  @checkAbilites({ action: 'read', subject: 'User' })
+  @UseGuards(AbilitiesGuard)
   @Get()
   async getUsers(
     @Query('page') page = 1,
@@ -31,6 +39,9 @@ export class UsersController {
     }
   }
 
+
+  @checkAbilites({ action: 'read', subject: 'User' })
+  @UseGuards(AbilitiesGuard)
   @Get(':id')
   async getUserById(@Param('id') id: string) {
     try {
@@ -40,6 +51,8 @@ export class UsersController {
     }
   }
 
+  @checkAbilites({ action: 'update', subject: 'User' })
+  @UseGuards(AbilitiesGuard)
   @Put(':id')
   async updateUser(
     @Param('id') id: string,
@@ -52,6 +65,8 @@ export class UsersController {
     }
   }
 
+
+  @checkAbilites({ action: 'delete', subject: 'User' })
   @Delete(':id')
   async deleteUser(@Param('id') id: string) {
     try {

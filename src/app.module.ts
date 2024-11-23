@@ -10,6 +10,7 @@ import { AtGuard } from './auth/guards';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { CaslModule } from './casls/casl.module';
 
 @Module({
   imports: [ConfigModule.forRoot({

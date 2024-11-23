@@ -1,1 +1,0 @@
-https://medium.com/yavar/casl-roles-with-persisted-permissions-in-nestjs-152129f4a6fb

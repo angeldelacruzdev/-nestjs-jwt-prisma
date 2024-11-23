@@ -34,6 +34,7 @@ export class AtGuard extends AuthGuard('jwt') {
 
         try {
             const payload = await this.validateToken(token);
+
             request.user = payload;
             return true;
         } catch (err) {

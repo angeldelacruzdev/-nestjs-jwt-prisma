@@ -24,15 +24,15 @@ export class AuthService extends AuthJwt {
                     name: dto.name,
                     email: dto.email,
                     password: hash,
+                    role_id: 2,
                 }
             })
 
-            const tokens = await this.getToken(created.id, created.email);
+            const tokens = await this.getToken(created.id, created.email, created.role_id);
             await this.updatedRtHash(created.id, tokens.refresh_token);
 
             return tokens
         } catch (error) {
-            console.log(error)
             const allowedExceptions = [UnauthorizedException, UpdateHashException, ConflictException, HashingException];
 
             if (allowedExceptions.some((exception) => error instanceof exception)) {
@@ -49,9 +49,11 @@ export class AuthService extends AuthJwt {
 
             const user = await this.findUserEmail(dto.email);
 
+            console.log(user)
+
             await this.compareUserPassword(dto.password, user.password);
 
-            const tokens = await this.getToken(user.id, user.email);
+            const tokens = await this.getToken(user.id, user.email, user.role_id);
 
             await this.updatedRtHash(user.id, tokens.refresh_token);
 

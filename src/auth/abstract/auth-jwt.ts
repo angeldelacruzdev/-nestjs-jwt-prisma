@@ -26,13 +26,14 @@ export abstract class AuthJwt {
      * and `RT` for refresh token. The access token expires in 10 minutes, while the refresh token
      * expires in 7
      */
-    async getToken(userId: number, email: string): Promise<Tokens> {
+    async getToken(userId: number, email: string, role_id: number): Promise<Tokens> {
         try {
             const [at, rt] = await Promise.all([
                 this.jwtService.signAsync(
                     {
                         sub: userId,
-                        email
+                        email,
+                        role_id
                     },
                     {
                         secret: process.env.JWT_SECRET,
@@ -42,7 +43,8 @@ export abstract class AuthJwt {
                 this.jwtService.signAsync(
                     {
                         sub: userId,
-                        email
+                        email,
+                        role_id
                     },
                     {
                         secret: process.env.RT,
@@ -161,7 +163,7 @@ export abstract class AuthJwt {
                 throw new ForbiddenException('El token ha expirado.');
             }
 
-            const tokens = await this.getToken(user.id, user.email);
+            const tokens = await this.getToken(user.id, user.email, user.role_id);
 
             const hashToken = await this.hash(tokens.refresh_token);
             await this.updatedRtHash(user.id, hashToken);
@@ -188,7 +190,8 @@ export abstract class AuthJwt {
         const user = await this.prismaService.user.findFirst({
             where: {
                 email
-            }
+            },
+
         })
         return user;
     }

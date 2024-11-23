@@ -35,7 +35,7 @@ export const actions = [
     'delete'
 ] as const;
 
-export const subjects = ['Story', 'User', 'all'] as const;
+export const subjects = ['User', 'all'] as const;
 
 export type Abilities = [
     (typeof actions)[number],
@@ -55,6 +55,7 @@ export class AbilitiesGuard implements CanActivate {
         createMongoAbility<AppAbility>(rules);
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
+
         const rules: any =
             this.reflector.get<RequiredRule[]>(CHECK_ABILITY, context.getHandler()) ||
             [];
@@ -67,6 +68,7 @@ export class AbilitiesGuard implements CanActivate {
             }
         });
 
+ 
         const parsedUserPermissions = this.parseCondition(
             userPermissions,
             currentUser
