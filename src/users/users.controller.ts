@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
 import { checkAbilites } from '../casls/decorators/abilities.decorator';
 import { AbilitiesGuard } from '../casls/guards/abilities.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -56,7 +57,7 @@ export class UsersController {
   @Put(':id')
   async updateUser(
     @Param('id') id: string,
-    @Body() data: Prisma.UserUpdateInput,
+    @Body() data: UpdateUserDto,
   ) {
     try {
       return await this.userService.updateUser(Number(id), data);
