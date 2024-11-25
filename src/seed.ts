@@ -39,17 +39,17 @@ export const permissions = [
 export const users = [
     {
         id: 1,
-        name: 'Billian David',
+        name: 'Angel De La Cruz',
         role_id: 1,
-        email: 'billy@yopmail.com',
-        password: '$2b$10$FpchyidGNMQQ5kMH/OGp4eLa1jEQd52VooZwXdsOsYSf55swam8d2'
+        email: 'angel@yopmail.com',
+        password: '$2b$10$FpchyidGNMQQ5kMH/OGp4eLa1jEQd52VooZwXdsOsYSf55swam8d2' // Admin@123456
     },
     {
         id: 2,
-        name: 'Bennison Devadoss',
+        name: 'Ale Peralta',
         role_id: 2,
-        email: 'bennison@yopmail.com',
-        password: '$2b$10$FpchyidGNMQQ5kMH/OGp4eLa1jEQd52VooZwXdsOsYSf55swam8d2'
+        email: 'ale@yopmail.com',
+        password: '$2b$10$FpchyidGNMQQ5kMH/OGp4eLa1jEQd52VooZwXdsOsYSf55swam8d2' // Admin@123456
     }
 ];
 
