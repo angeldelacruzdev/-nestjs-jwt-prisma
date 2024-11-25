@@ -35,7 +35,7 @@ export const actions = [
     'delete'
 ] as const;
 
-export const subjects = ['User', 'all'] as const;
+export const subjects = ['Role', 'User', 'all'] as const;
 
 export type Abilities = [
     (typeof actions)[number],
@@ -68,7 +68,7 @@ export class AbilitiesGuard implements CanActivate {
             }
         });
 
- 
+
         const parsedUserPermissions = this.parseCondition(
             userPermissions,
             currentUser

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -73,7 +74,7 @@ export class UsersService {
   // Actualizar un usuario, su rol o su perfil
   async updateUser(
     id: number,
-    data: Prisma.UserUpdateInput,
+    data: UpdateUserDto,
   ): Promise<User> {
     try {
       return await this.prismaService.user.update({

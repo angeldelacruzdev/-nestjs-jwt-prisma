@@ -49,8 +49,6 @@ export class AuthService extends AuthJwt {
 
             const user = await this.findUserEmail(dto.email);
 
-            console.log(user)
-
             await this.compareUserPassword(dto.password, user.password);
 
             const tokens = await this.getToken(user.id, user.email, user.role_id);
