@@ -26,7 +26,7 @@ model User {
   role_id          Int      @db.Integer()
   Profile          Profile?
 
-   @@map("users6")
+   @@map("users")
 }
 
 model Role {

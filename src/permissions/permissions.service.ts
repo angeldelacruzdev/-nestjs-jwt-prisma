@@ -1,11 +1,16 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { PermissionRoleDto } from './dto';
 
 @Injectable()
 export class PermissionsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(createPermissionDto: CreatePermissionDto) {
     try {
@@ -27,8 +32,11 @@ export class PermissionsService {
 
   async findOne(id: number) {
     try {
-      const permission = await this.prisma.permission.findUnique({ where: { id } });
-      if (!permission) throw new NotFoundException(`Permission with id ${id} not found`);
+      const permission = await this.prisma.permission.findUnique({
+        where: { id },
+      });
+      if (!permission)
+        new NotFoundException(`Permission with id ${id} not found`);
       return permission;
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -41,11 +49,10 @@ export class PermissionsService {
 
   async update(id: number, updatePermissionDto: UpdatePermissionDto) {
     try {
-      const updatedPermission = await this.prisma.permission.update({
+      return await this.prisma.permission.update({
         where: { id },
         data: updatePermissionDto,
       });
-      return updatedPermission;
     } catch (error) {
       console.error('Error updating permission:', error);
       if (error.code === 'P2025') {
@@ -65,5 +72,9 @@ export class PermissionsService {
       }
       throw new InternalServerErrorException('Could not delete permission');
     }
+  }
+
+  async addPermissionToRole(dto: PermissionRoleDto) {
+    console.log(dto);
   }
 }

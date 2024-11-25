@@ -23,7 +23,7 @@ export class AuthController {
     @Public()
     @Post('signin')
     async signin(@Body() dto: SigninDto) {
-        return await this.authService.signin(dto)
+        return await this.authService.signing(dto)
     }
 
     @UseGuards(AtGuard)
